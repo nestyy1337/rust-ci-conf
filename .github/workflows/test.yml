@@ -1,4 +1,4 @@
-# This is the main CI workflow that runs the test suite on all pushes to main and all pull requests.
+# This is the main CI workflow that runs the test suite on all pushes to master and all pull requests.
 # It runs the following jobs:
 # - required: runs the test suite on ubuntu with stable and beta rust toolchains
 # - minimal: runs the test suite with the minimal versions of the dependencies that satisfy the
@@ -10,7 +10,7 @@ permissions:
   contents: read
 on:
   push:
-    branches: [main]
+    branches: [master]
   pull_request:
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
@@ -26,11 +26,11 @@ jobs:
         # toolchain
         toolchain: [stable, beta]
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install ${{ matrix.toolchain }}
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # branch=master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.toolchain }}
       - name: cargo generate-lockfile
@@ -69,15 +69,15 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / minimal-versions
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # branch=master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
       - name: Install nightly for -Zminimal-versions
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # branch=master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: nightly
       - name: rustup default stable
@@ -101,11 +101,11 @@ jobs:
       #   if: runner.os == 'Windows'
       # - run: vcpkg install openssl:x64-windows-static-md
       #   if: runner.os == 'Windows'
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # branch=master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
       - name: cargo generate-lockfile
@@ -138,16 +138,16 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / coverage
     steps:
-      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # tag=v6.0.1
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Install stable
-        uses: dtolnay/rust-toolchain@e97e2d8cc328f1b50210efc529dca0028893a2d9 # branch=master
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
           components: llvm-tools-preview
       - name: cargo install cargo-llvm-cov
-        uses: taiki-e/install-action@a983ca795126a4be4e8a44879ac5c4c3ef66cae1 # tag=v2.65.11
+        uses: taiki-e/install-action@v2
         with:
           tool: cargo-llvm-cov
       - name: cargo generate-lockfile
@@ -158,7 +158,7 @@ jobs:
       - name: Record Rust version
         run: echo "RUST=$(rustc --version)" >> "$GITHUB_ENV"
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@671740ac38dd9b0130fbe1cec585b89eea48d3de # tag=v5.5.2
+        uses: codecov/codecov-action@v4
         with:
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
